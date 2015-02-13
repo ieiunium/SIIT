@@ -22,4 +22,31 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+  <!-- shade creates an executable jar with the main class -->
+  <!-- showing in the manifest file -->
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-shade-plugin</artifactId>
+	<version>2.3</version>
+	<executions>
+	  <execution>
+	    <goals>
+	      <goal>shade</goal>
+	    </goals>
+	    <configuration>
+	      <createDependencyReducedPom>false</createDependencyReducedPom>
+	      <transformers>
+		<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+		  <mainClass>com.siit.lab1.App</mainClass>
+		</transformer>
+	      </transformers>
+	    </configuration>
+	  </execution>
+	</executions>
+      </plugin>
+      
+     </plugins>
+   </build>
 </project>
