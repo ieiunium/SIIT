@@ -10,7 +10,7 @@ import java.util.Arrays;
 public class DogManager {
     private Dog dogs[] = null;
     private final int numberOfDogs;
-    public DogManager(final int numberOfDogs){
+    public DogManager(int numberOfDogs,int gensPerDog){
         if(numberOfDogs < 1){
             this.numberOfDogs = 50;
         }else {
@@ -18,17 +18,25 @@ public class DogManager {
         }
         dogs = new Dog[numberOfDogs];
         for(int i = 0;i<numberOfDogs;i++){
-            dogs[i]= new Dog(1000);
+            dogs[i]= new Dog(gensPerDog);
         }
     }
-    public void evolution(){
+    public void evolution(int steps){
         Dog children[] = dogs.clone();
-        for(int step = 0;step < 10500;step++) {
+        double lastAvgFitness=-1;
+        int lastFitnessCount=0;
+
+        for(int step = 0;step < steps && lastFitnessCount < 10;step++) {
             Arrays.sort(dogs);
             int half = numberOfDogs / 2;
             for (int i = 0; i < half; i++) {
-                Dog d1 = dogs[i].getCopy();
-                Dog d2 = dogs[i + 1].getCopy();
+                int i1 = Dog.random.nextInt(half);
+                int i2;
+                do{
+                    i2 = Dog.random.nextInt(half);
+                }while (i1==i2);
+                Dog d1 = dogs[i1].getCopy();
+                Dog d2 = dogs[i2].getCopy();
                 Dog.crossOver(d1, d2);
                 children[i * 2] = d1;
                 children[i * 2 + 1] = d2;
@@ -37,9 +45,17 @@ public class DogManager {
             Dog tmp[] = children;
             children = dogs;
             dogs = tmp;
-        }
-        for (int i = 0; i < dogs.length; i++) {
-            System.out.println(dogs[i].fitness() + " " + children[i].fitness());
+            double avgFitness = 0;
+            for (int i = 0; i < dogs.length; i++) {
+                avgFitness+=dogs[i].fitness();
+            }
+            if( ((int)lastAvgFitness) == ((int)avgFitness) ){
+                lastFitnessCount ++;
+            }else{
+                lastFitnessCount = 0;
+            }
+            lastAvgFitness = avgFitness;
+            System.out.println(step+"\t"+avgFitness/dogs.length);
         }
     }
 }

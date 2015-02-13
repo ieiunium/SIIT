@@ -8,7 +8,7 @@ import java.util.Random;
 public class Dog implements Comparable{
     private boolean gens[];
     private int numberOfGens;
-    private static Random random = new Random();
+    public static final Random random = new Random();
     public Dog(final int numberOfGens){
         if(numberOfGens < 1){
             this.numberOfGens = 1000;
