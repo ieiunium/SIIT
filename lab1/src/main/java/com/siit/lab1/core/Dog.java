@@ -56,6 +56,14 @@ public class Dog implements Comparable{
             father.gens[i] = mother.gens[i];
             mother.gens[i] = tmp;
         }
+        for(int i = 0; i < mother.gens.length; i++){
+            if(random.nextInt(1000)<1){
+                father.gens[i] = !father.gens[i];
+            }
+            if(random.nextInt(1000)<1){
+                mother.gens[i] = !mother.gens[i];
+            }
+        }
     }
 
     @Override

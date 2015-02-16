@@ -25,7 +25,7 @@ public class DogManager {
         Dog children[] = dogs.clone();
         double lastAvgFitness=-1;
         int lastFitnessCount=0;
-
+        System.out.println("step"+"\t\t" +"chromosome");
         for(int step = 0;step < steps && lastFitnessCount < 10;step++) {
             Arrays.sort(dogs);
             int half = numberOfDogs / 2;
@@ -49,13 +49,15 @@ public class DogManager {
             for (int i = 0; i < dogs.length; i++) {
                 avgFitness+=dogs[i].fitness();
             }
-            if( ((int)lastAvgFitness) == ((int)avgFitness) ){
+            if( Math.abs(lastAvgFitness - avgFitness) <0.00001 ){
                 lastFitnessCount ++;
             }else{
                 lastFitnessCount = 0;
             }
             lastAvgFitness = avgFitness;
-            System.out.println(step+"\t"+avgFitness/dogs.length);
+            System.out.println(step+"\t"+avgFitness/dogs.length+"\t"+ dogs[0].fitness());
+            //if(step%50==0)
+            //    System.out.println(step+"\t\t" +dogs[0]);
         }
     }
 }
