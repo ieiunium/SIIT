@@ -1,6 +1,9 @@
 package com.siit.lab2.core;
 
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +26,16 @@ public class ChromosomeManager {
         }
     }
     public List<Chromosome> evolution(int steps,World world){
-
+        PrintWriter pwStep;
+        PrintWriter pwBest;
+        PrintWriter pwStepBest;
+        try {
+            pwStep = new PrintWriter(new File("step.txt"));
+            pwBest = new PrintWriter(new File("best.txt"));
+            pwStepBest = new PrintWriter(new File("stepbest.txt"));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("cant open txt files");
+        }
         List<Chromosome> resList = new ArrayList<Chromosome>();
         Chromosome children[] = chromosomes.clone();
         int rouletteWheel[] = new int[chromosomes.length];
@@ -31,19 +43,32 @@ public class ChromosomeManager {
         for(int step = 0;step < steps; step++) {
             for(Chromosome i:chromosomes){
                 i.calcFitness(world);
-                if(resList.size()<50 && i.random.nextInt(1000)<500){
+                if(resList.size()<10 && i.random.nextInt(1000)<500){
                     resList.add(i.getCopy());
                 }
             }
 
             Arrays.sort(chromosomes);
-            //System.out.println("\t"+chromosomes[0].getFitness());
+
+            /*double avgFitness = 0;
+            for (int i = 0; i < chromosomes.length; i++) {
+                avgFitness+= chromosomes[i].getFitness();
+            }*/
+            System.out.println(step + "\t" + chromosomes[0].getFitness());
+            pwStepBest.println(step + "\t" + chromosomes[0].getFitness());
+            pwStep.println(step);
+            pwBest.println(chromosomes[0].getFitness());
             int sum = 0;
             int j = 0;
             for(Chromosome i:chromosomes){
                 int tmp=0;
                 if(i.getFitness()==0) {
-                    //TODO
+                    pwBest.flush();
+                    pwBest.close();
+                    pwStep.flush();
+                    pwStep.close();
+                    pwStepBest.flush();
+                    pwStepBest.close();
                     resList.add(i.getCopy());
                     return resList;
                 }else{
@@ -55,13 +80,6 @@ public class ChromosomeManager {
 
                 j++;
             }
-
-            double avgFitness = 0;
-            for (int i = 0; i < chromosomes.length; i++) {
-                avgFitness+= chromosomes[i].getFitness();
-            }
-            System.out.println(step+"\t"+avgFitness/ chromosomes.length);
-
             for (int i = 0; i < chromosomes.length; i++) {
                 int i1 = getRandomIndex(sum,rouletteWheel)/2;
                 int i2;
@@ -74,6 +92,12 @@ public class ChromosomeManager {
             children = chromosomes;
             chromosomes = tmp;
         }
+        pwBest.flush();
+        pwBest.close();
+        pwStep.flush();
+        pwStep.close();
+        pwStepBest.flush();
+        pwStepBest.close();
         return resList;
     }
 

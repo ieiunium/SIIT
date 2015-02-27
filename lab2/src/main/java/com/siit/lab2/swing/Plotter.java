@@ -42,7 +42,7 @@ public class Plotter extends JFrame{
         try {
             Graphics g = image.getGraphics();
             paint(g);
-            ImageIO.write(image, "png", new File(fileName));
+            ImageIO.write(image, "png", new File(fileName.matches("[.]png$")?fileName:fileName+".png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
