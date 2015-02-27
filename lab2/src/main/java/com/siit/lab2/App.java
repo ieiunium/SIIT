@@ -27,12 +27,14 @@ public class App
         ChromosomeManager chromosomeManager= new ChromosomeManager(dogs,gensPerDog);
 
         List<Chromosome> chromosomes = chromosomeManager.evolution(maxSteps,world);
+        List<Chromosome> chromosomes2 = new ArrayList<Chromosome>();
+        chromosomes2.add(chromosomes.get(chromosomes.size()-1));
+        chromosomes.remove(chromosomes.size()-1);
+
         Plotter plotter = new Plotter(chromosomes,world,"some dogs");
         plotter.setTitle("Some dogs");
         plotter.setVisible(true);
 
-        List<Chromosome> chromosomes2 = new ArrayList<Chromosome>();
-        chromosomes2.add(chromosomes.get(chromosomes.size()-1));
         Plotter plotter2 = new Plotter(chromosomes2,world,"best");
         plotter2.setTitle("Lucky");
         plotter2.setVisible(true);
