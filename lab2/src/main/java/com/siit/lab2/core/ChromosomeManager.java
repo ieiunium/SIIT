@@ -31,7 +31,7 @@ public class ChromosomeManager {
         for(int step = 0;step < steps; step++) {
             for(Chromosome i:chromosomes){
                 i.calcFitness(world);
-                if(i.random.nextInt(1000)<10){
+                if(resList.size()<50 && i.random.nextInt(1000)<500){
                     resList.add(i.getCopy());
                 }
             }
