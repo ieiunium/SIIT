@@ -3,6 +3,8 @@ package com.siit.lab2.core;
 import java.awt.*;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -13,13 +15,53 @@ public class World {
     private List<HotDog> hotDogs = new ArrayList<HotDog>();
 
     public final int width,heigth;
+    public int []field[];
 
     public World(int width, int heigth) {
         this.width = width;
         this.heigth = heigth;
+        field = new int[width][];
+        for(int i=0;i<width;i++){
+            field[i] = new int[heigth];
+        }
+        calcDistField();
+    }
+    public void calcDistField(){
+        for(int i=0;i<width;i++){
+            for(int j=0;j<heigth;j++){
+                field[i][j] = -1;
+            }
+        }
+        class P{
+            public int x,y;
+            P(int y, int x) {
+                this.y = y;
+                this.x = x;
+            }
+        };
+        Deque<P> points = new LinkedList<P>();
+        P p = new P(hotDogs.get(0).x,hotDogs.get(0).y);
+        points.addLast(p);
+
+        field[p.x][p.y]=0;
+        while(!points.isEmpty()){
+            p = points.pollFirst();
+            int i=field[p.x][p.y]+1;
+            int offsetX[]={};
+            int offsetY[]={};
+            for(int j = 0;j<8;j++){
+                int x = p.x + offsetX[j];
+                int y = p.y + offsetY[j];
+                if(field[x][y]==-1){
+                    field[x][y] = i;
+                }
+            }
+        }
+
     }
     public void addLake(Lake lake){
         lakes.add(lake);
+        calcDistField();
     }
     public void addHotDog(HotDog hotDog){
         hotDogs.add(hotDog);
