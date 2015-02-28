@@ -1,8 +1,0 @@
-#!/usr/bin/gnuplot -persist 
-set terminal  png 
-set ylabel "fitness"
-set xlabel "generation"
-set output 'graph.png' 
-set grid xtics ytics mytics
-set title "Best dog"
-plot 'stepbest.txt'using 1:2 with linespoints ti "best dog's fitness"

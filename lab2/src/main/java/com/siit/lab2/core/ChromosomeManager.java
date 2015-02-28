@@ -50,17 +50,12 @@ public class ChromosomeManager {
                 }else{
                     reserv = i.getCopy();
                 }
-                if(step%100==0 && i.random.nextInt(1000)<300){
-                    resList.add(i.getCopy());
-                }
+
             }
-
             Arrays.sort(chromosomes);
-
-            /*double avgFitness = 0;
-            for (int i = 0; i < chromosomes.length; i++) {
-                avgFitness+= chromosomes[i].getFitness();
-            }*/
+            if(step%50==0){
+                resList.add(chromosomes[0].getCopy());
+            }
             System.out.println(step + "\t" + chromosomes[0].getFitness());
             pwStepBest.println(step + "\t" + chromosomes[0].getFitness());
             pwStep.println(step);
@@ -90,10 +85,10 @@ public class ChromosomeManager {
                 j++;
             }
             for (int i = 0; i < chromosomes.length; i++) {
-                int i1 = getRandomIndex(sum,rouletteWheel);
+                int i1 = getRandomIndex(sum,rouletteWheel)/2;
                 int i2;
                 do{
-                    i2 = getRandomIndex(sum,rouletteWheel);
+                    i2 = getRandomIndex(sum,rouletteWheel)/2;
                 }while (i1==i2);
                 children[i] = Chromosome.crossOver(chromosomes[i1], chromosomes[i2]);
             }

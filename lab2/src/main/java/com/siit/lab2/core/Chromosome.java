@@ -62,7 +62,7 @@ public class Chromosome implements Comparable{
             }else {
                 chromosome.gens[i] = father.gens[i];
             }
-            if(random.nextInt(1000)<1){
+            if(random.nextInt(1000)<10){
                 chromosome.gens[i] = random.nextInt(4);
             }
         }

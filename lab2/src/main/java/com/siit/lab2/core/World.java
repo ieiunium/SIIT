@@ -1,6 +1,11 @@
 package com.siit.lab2.core;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -24,7 +29,7 @@ public class World {
         for(int i=0;i<width;i++){
             field[i] = new int[heigth];
         }
-        calcDistField();
+
     }
     public void calcDistField(){
         for(int i=0;i<width;i++){
@@ -34,7 +39,7 @@ public class World {
         }
         class P{
             public int x,y;
-            P(int y, int x) {
+            P(int x, int y) {
                 this.y = y;
                 this.x = x;
             }
@@ -44,24 +49,57 @@ public class World {
         points.addLast(p);
 
         field[p.x][p.y]=0;
+        int offsetX[]={-1,0,1,1,1,0,-1,-1};
+        int offsetY[]={1,1,1,0,-1,-1,-1,0};
         while(!points.isEmpty()){
             p = points.pollFirst();
+
             int i=field[p.x][p.y]+1;
-            int offsetX[]={};
-            int offsetY[]={};
+
             for(int j = 0;j<8;j++){
                 int x = p.x + offsetX[j];
                 int y = p.y + offsetY[j];
-                if(field[x][y]==-1){
+                if(x<0){
+                    x+=width;
+                    //continue;
+                }
+                if(y<0){
+                    y+=heigth;
+                    //continue;
+                }
+                if(x>=width){
+                    x-=width;
+                    //continue;
+                }
+                if(y>=heigth){
+                    y-=heigth;
+                    //continue;
+                }
+                if( ((field[x][y]==-1||field[x][y]>i)) && !this.drown(x,y)){
                     field[x][y] = i;
+                    points.addLast(new P(x,y));
                 }
             }
         }
+        BufferedImage image = new BufferedImage(width,heigth,BufferedImage.TYPE_INT_ARGB);
+        try {
+            Graphics g = image.getGraphics();
+            for(int i=0;i<heigth;i++){
+                for(int j=0;j<width;j++){
+                    g.setColor(Color.getHSBColor((field[j][i]/900.0F),1.0F,1.0F));
+                    g.drawOval(j,i,1,1);
+                }
+            }
+            this.paint(g,0,0);
 
+            ImageIO.write(image, "png", new File("map.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     public void addLake(Lake lake){
         lakes.add(lake);
-        calcDistField();
+        //calcDistField();
     }
     public void addHotDog(HotDog hotDog){
         hotDogs.add(hotDog);
@@ -136,8 +174,12 @@ public class World {
                 hd = i;
             }
         }
+        if(x>=400 && x<=605 && y>=400 && y<= 605){
 
+            res += Math.abs(y-390)*2 + Math.abs(x - hd.x);
+        }
         return res;
+        //return this.field[x][y];
     }
 
     public void paint(Graphics g,int DX,int DY){
@@ -147,12 +189,15 @@ public class World {
         for(HotDog i:hotDogs){
             int r = 2;
             g.fillOval(DX + i.x-r,DY + i.y-r,r*2+1,r*2+1);
-            int R = 50;
-            g.drawOval(DX + i.x-R,DY + i.y-R,R*2+1,R*2+1);
+            //int R = 50;
+            //g.drawOval(DX + i.x-R,DY + i.y-R,R*2+1,R*2+1);
         }
         g.setColor(Color.BLUE);
         for(Lake i:lakes){
-            g.fillRect(i.x1+DX,i.y1+DY,i.x2-i.x1+DX,i.y2-i.y1+DY);
+            g.fillRect(i.x1+DX
+                    ,i.y1+DY
+                    ,i.x2-i.x1
+                    ,i.y2-i.y1);
         }
 
     }
