@@ -33,11 +33,11 @@ public class App
 
         Plotter plotter = new Plotter(chromosomes,world,"some dogs");
         plotter.setTitle("Some dogs");
-        plotter.setVisible(true);
+        //plotter.setVisible(true);
 
         Plotter plotter2 = new Plotter(chromosomes2,world,"best");
         plotter2.setTitle("Lucky");
-        plotter2.setVisible(true);
+        //plotter2.setVisible(true);
 
 
     }

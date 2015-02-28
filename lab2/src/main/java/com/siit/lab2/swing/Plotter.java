@@ -8,7 +8,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 
 /**
@@ -23,8 +25,28 @@ public class Plotter extends JFrame{
         this.world = world;
         this.setSize(2*DX+world.width,2*DY+world.heigth);
         this.saveToPNG(filename);
+        this.saveToFiles(filename);
     }
-
+    public void saveToFiles(String fileName){
+        fileName = fileName + "folder";
+        File f = new File(fileName);
+        f.mkdir();
+        for(int i = 0;i<chromosomes.size();i++){
+            File tmpX = new File(f,String.valueOf(i)+"X");
+            File tmpY = new File(f,String.valueOf(i)+"Y");
+            try {
+                PrintWriter pwX = new PrintWriter(tmpX);
+                PrintWriter pwY = new PrintWriter(tmpY);
+                world.printPath(chromosomes.get(i),pwX,pwY);
+                pwX.flush();
+                pwY.flush();
+                pwX.close();
+                pwY.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
     @Override
     public void paint(Graphics g) {
         super.paint(g);

@@ -1,6 +1,7 @@
 package com.siit.lab2.core;
 
 import java.awt.*;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -147,6 +148,52 @@ public class World {
                 y-=heigth;
             }
             g.drawOval(x+DX,y+DY,1,1);
+            if(found(x,y)){
+                return;
+            }
+            if(drown(x, y)){
+                return;
+            }
+        }
+    }
+
+    public void printPath(Chromosome chromosome, PrintWriter pwX,PrintWriter pwY){
+        int x0 = width / 2;
+        int y0 = heigth / 2;
+        int x = x0;
+        int y = y0;
+        boolean drowned=false;
+        for(int i = 0; i<chromosome.gens.length; i++){
+            switch (chromosome.gens[i]){
+                case 0:
+                    y += +1;
+                    break;
+                case 1:
+                    y += -1;
+                    break;
+                case 2:
+                    x += +1;
+                    break;
+                case 3:
+                    x += -1;
+                    break;
+                default:
+                    throw new RuntimeException("bad gene");
+            }
+            if(x<0){
+                x+=width;
+            }
+            if(y<0){
+                y+=heigth;
+            }
+            if(x>width){
+                x-=width;
+            }
+            if(y>heigth){
+                y-=heigth;
+            }
+            pwX.println(x);
+            pwY.println(y);
             if(found(x,y)){
                 return;
             }
