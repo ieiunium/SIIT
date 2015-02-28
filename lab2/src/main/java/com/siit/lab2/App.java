@@ -16,14 +16,14 @@ public class App
 {
     public static void main( String[] args )
     {
-        int maxSteps = 1500;
+        int maxSteps = 2500;
         int dogs = 50;
         int gensPerDog = 1000;
         World world = new World(1000,1000);
-        world.addHotDog(new HotDog(200,800));
-        world.addHotDog(new HotDog(800,200));
-        //world.addLake(new Lake(700,900,600,800));
-        //world.addLake(new Lake(450,450,650,300));
+        world.addHotDog(new HotDog(800, 600));
+        world.addLake(new Lake(400, 500, 405, 605));
+        world.addLake(new Lake(400,600,605,605));
+        world.addLake(new Lake(600,500,605,605));
         ChromosomeManager chromosomeManager= new ChromosomeManager(dogs,gensPerDog);
 
         List<Chromosome> chromosomes = chromosomeManager.evolution(maxSteps,world);

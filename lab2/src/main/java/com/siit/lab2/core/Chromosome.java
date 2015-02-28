@@ -23,11 +23,16 @@ public class Chromosome implements Comparable{
             gens[i] = random.nextInt(4);
         }
     }
+    public void reset(Chromosome chromosome){
+        for(int i=0;i<gens.length;i++){
+            gens[i] = chromosome.gens[i];
+        }
+    }
     private Chromosome(){
 
     }
-    public void calcFitness(World world){
-        fitness = world.simulate(this,world);
+    public int calcFitness(World world){
+        return fitness = world.simulate(this,world);
     }
     public int getFitness(){
         return fitness;
@@ -57,7 +62,7 @@ public class Chromosome implements Comparable{
             }else {
                 chromosome.gens[i] = father.gens[i];
             }
-            if(random.nextInt(1000)<10){
+            if(random.nextInt(1000)<1){
                 chromosome.gens[i] = random.nextInt(4);
             }
         }

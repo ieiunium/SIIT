@@ -41,9 +41,16 @@ public class ChromosomeManager {
         int rouletteWheel[] = new int[chromosomes.length];
 
         for(int step = 0;step < steps; step++) {
+            Chromosome reserv = new Chromosome(1000);
             for(Chromosome i:chromosomes){
                 i.calcFitness(world);
-                if(resList.size()<10 && i.random.nextInt(1000)<500){
+                if(i.getFitness()<0){
+                    i.reset(reserv);
+                    i.calcFitness(world);
+                }else{
+                    reserv = i.getCopy();
+                }
+                if(step%100==0 && i.random.nextInt(1000)<300){
                     resList.add(i.getCopy());
                 }
             }
@@ -75,16 +82,18 @@ public class ChromosomeManager {
                     //tmp = (i.getFitness()>1000)?0:(1000 - i.getFitness());
                     tmp = 100000/i.getFitness();
                 }
-                sum += tmp;
+                if(tmp>0){
+                    sum += tmp;
+                }
                 rouletteWheel[j] = sum;
 
                 j++;
             }
             for (int i = 0; i < chromosomes.length; i++) {
-                int i1 = getRandomIndex(sum,rouletteWheel)/2;
+                int i1 = getRandomIndex(sum,rouletteWheel);
                 int i2;
                 do{
-                    i2 = getRandomIndex(sum,rouletteWheel)/2;
+                    i2 = getRandomIndex(sum,rouletteWheel);
                 }while (i1==i2);
                 children[i] = Chromosome.crossOver(chromosomes[i1], chromosomes[i2]);
             }
@@ -102,6 +111,9 @@ public class ChromosomeManager {
     }
 
     public int getRandomIndex(int sum,int rouletteWheel[]){
+        if(sum<1){
+            return Chromosome.random.nextInt(rouletteWheel.length);
+        }
         int random = Chromosome.random.nextInt(sum);
         for(int i = 0; i<rouletteWheel.length; i++ ){
             if(random<rouletteWheel[i]){

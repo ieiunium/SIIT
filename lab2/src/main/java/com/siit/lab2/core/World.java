@@ -63,7 +63,7 @@ public class World {
                 return 0;
             }
             if(drown(x, y)){
-                return Integer.MAX_VALUE/2;
+                return -1;
             }
         }
         return dist(x,y);
@@ -86,12 +86,15 @@ public class World {
     }
     public int dist(int x,int y){
         int res = Integer.MAX_VALUE;
+        HotDog hd = null;
         for(HotDog i:hotDogs){
             int tmp = Math.abs(x - i.x)+Math.abs(y - i.y);
             if(tmp < res){
                 res = tmp;
+                hd = i;
             }
         }
+
         return res;
     }
 
@@ -107,7 +110,7 @@ public class World {
         }
         g.setColor(Color.BLUE);
         for(Lake i:lakes){
-            g.fillRect(i.x1,i.y1,i.x2-i.x1,i.y2-i.y1);
+            g.fillRect(i.x1+DX,i.y1+DY,i.x2-i.x1+DX,i.y2-i.y1+DY);
         }
 
     }
