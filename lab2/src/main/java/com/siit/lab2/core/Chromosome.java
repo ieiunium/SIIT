@@ -32,7 +32,8 @@ public class Chromosome implements Comparable{
 
     }
     public int calcFitness(World world){
-        return fitness = world.simulate(this,world);
+        fitness = world.simulate(this,world);
+        return fitness;
     }
     public int getFitness(){
         return fitness;
@@ -79,5 +80,19 @@ public class Chromosome implements Comparable{
     }
     public void paint(Graphics g,int DX,int DY){
 
+    }
+
+    public static double s(double d){
+        double sigma = 10;
+        if(d<sigma){
+            return 1-(d/sigma);
+        }else{
+            return 0;
+        }
+    }
+
+    public static int dist(Chromosome c1, Chromosome c2){
+        //TODO
+        return 0;
     }
 }

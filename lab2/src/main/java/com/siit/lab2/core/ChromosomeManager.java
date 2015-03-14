@@ -22,6 +22,8 @@ public class ChromosomeManager {
         }
     }
     public List<List<Chromosome>> evolution(int steps,World world){
+        int distances[][] = new int[chromosomes.length][chromosomes.length];
+
         PrintWriter pwStep;
         PrintWriter pwBest;
         PrintWriter pwStepBest;
@@ -52,6 +54,8 @@ public class ChromosomeManager {
 
             }
             Arrays.sort(chromosomes);
+
+
             for(int i = 0;i<8;i++) {
                 tmpRes.add(chromosomes[i].getCopy());
             }
