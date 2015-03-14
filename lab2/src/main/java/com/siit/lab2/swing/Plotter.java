@@ -1,5 +1,6 @@
 package com.siit.lab2.swing;
 
+import com.siit.lab2.App;
 import com.siit.lab2.core.Chromosome;
 import com.siit.lab2.core.World;
 
@@ -28,7 +29,7 @@ public class Plotter extends JFrame{
         this.saveToFiles(filename);
     }
     public void saveToFiles(String fileName){
-        fileName = fileName + "folder";
+        fileName = App.folder+fileName + "folder";
         File f = new File(fileName);
         f.mkdir();
         for(int i = 0;i<chromosomes.size();i++){
@@ -63,6 +64,7 @@ public class Plotter extends JFrame{
         try {
             Graphics g = image.getGraphics();
             paint(g);
+            fileName = App.folder + fileName;
             ImageIO.write(image, "png", new File(fileName.matches("[.]png$")?fileName:fileName+".png"));
         } catch (IOException e) {
             e.printStackTrace();

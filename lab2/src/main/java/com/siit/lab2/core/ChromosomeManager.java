@@ -1,6 +1,8 @@
 package com.siit.lab2.core;
 
 
+import com.siit.lab2.App;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -13,34 +15,31 @@ import java.util.List;
  */
 public class ChromosomeManager {
     private Chromosome chromosomes[] = null;
-    private final int numberOfDogs;
     public ChromosomeManager(int numberOfDogs, int gensPerDog){
-        if(numberOfDogs < 1){
-            this.numberOfDogs = 50;
-        }else {
-            this.numberOfDogs = numberOfDogs;
-        }
         chromosomes = new Chromosome[numberOfDogs];
         for(int i = 0;i<numberOfDogs;i++){
             chromosomes[i]= new Chromosome(gensPerDog);
         }
     }
-    public List<Chromosome> evolution(int steps,World world){
+    public List<List<Chromosome>> evolution(int steps,World world){
         PrintWriter pwStep;
         PrintWriter pwBest;
         PrintWriter pwStepBest;
         try {
-            pwStep = new PrintWriter(new File("step.txt"));
-            pwBest = new PrintWriter(new File("best.txt"));
-            pwStepBest = new PrintWriter(new File("stepbest.txt"));
+            pwStep = new PrintWriter(new File(App.folder+"step.txt"));
+            pwBest = new PrintWriter(new File(App.folder+"best.txt"));
+            pwStepBest = new PrintWriter(new File(App.folder+"stepbest.txt"));
         } catch (FileNotFoundException e) {
             throw new RuntimeException("cant open txt files");
         }
-        List<Chromosome> resList = new ArrayList<Chromosome>();
+        List<List<Chromosome>> resList = new ArrayList<List<Chromosome>>();
+
         Chromosome children[] = chromosomes.clone();
         int rouletteWheel[] = new int[chromosomes.length];
 
         for(int step = 0;step < steps; step++) {
+            List<Chromosome> tmpRes = new ArrayList<Chromosome>();
+            resList.add(tmpRes);
             Chromosome reserv = new Chromosome(1000);
             for(Chromosome i:chromosomes){
                 i.calcFitness(world);
@@ -53,8 +52,8 @@ public class ChromosomeManager {
 
             }
             Arrays.sort(chromosomes);
-            if(step%50==0){
-                resList.add(chromosomes[0].getCopy());
+            for(int i = 0;i<8;i++) {
+                tmpRes.add(chromosomes[i].getCopy());
             }
             System.out.println(step + "\t" + chromosomes[0].getFitness());
             pwStepBest.println(step + "\t" + chromosomes[0].getFitness());
@@ -71,7 +70,7 @@ public class ChromosomeManager {
                     pwStep.close();
                     pwStepBest.flush();
                     pwStepBest.close();
-                    resList.add(i.getCopy());
+                    tmpRes.add(i.getCopy());
                     return resList;
                 }else{
                     //tmp = (i.getFitness()>1000)?0:(1000 - i.getFitness());

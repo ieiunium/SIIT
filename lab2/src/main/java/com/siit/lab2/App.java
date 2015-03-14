@@ -14,33 +14,31 @@ import java.util.Queue;
  */
 public class App 
 {
+    public static final String folder = "target/";
     public static void main( String[] args )
     {
         int maxSteps = 20000;
-        int dogs = 100;
+        int dogs = 40;
         int gensPerDog = 1000;
 
         World world = new World(1000,1000);
+        world.addHotDog(new HotDog(200, 200));
         world.addHotDog(new HotDog(200, 800));
+        world.addHotDog(new HotDog(800, 200));
+        world.addHotDog(new HotDog(800, 800));
 
-        world.addLake(new Lake(400, 400, 401, 601));
-        world.addLake(new Lake(400,600,601,601));
-        world.addLake(new Lake(600,400,601,601));
-        world.calcDistField();
         ChromosomeManager chromosomeManager= new ChromosomeManager(dogs,gensPerDog);
-        List<Chromosome> chromosomes = chromosomeManager.evolution(maxSteps,world);
-        List<Chromosome> chromosomes2 = new ArrayList<Chromosome>();
-        chromosomes2.add(chromosomes.get(chromosomes.size()-1));
-        chromosomes.remove(chromosomes.size()-1);
-
-        Plotter plotter = new Plotter(chromosomes,world,"some dogs");
-        plotter.setTitle("Some dogs");
-        plotter.setVisible(true);
-
-        Plotter plotter2 = new Plotter(chromosomes2,world,"best");
-        plotter2.setTitle("Lucky");
-        plotter2.setVisible(true);
-
-
+        List<List<Chromosome>> chromosomes = chromosomeManager.evolution(maxSteps,world);
+        int index[] = {
+                0
+               ,Chromosome.random.nextInt(chromosomes.size()-2)+1
+               ,Chromosome.random.nextInt(chromosomes.size()-2)+1
+               ,chromosomes.size()-1
+        };
+        for(int i = 0; i<index.length;i++) {
+            Plotter plotter = new Plotter(chromosomes.get(index[i]), world, "generation"+String.valueOf(i));
+            plotter.setTitle("Some dogs");
+            //plotter.setVisible(true);
+        }
     }
 }
