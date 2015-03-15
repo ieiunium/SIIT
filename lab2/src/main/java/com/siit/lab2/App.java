@@ -17,7 +17,7 @@ public class App
     public static final String folder = "target/";
     public static void main( String[] args )
     {
-        int maxSteps = 20000;
+        int maxSteps = 2000;
         int dogs = 40;
         int gensPerDog = 1000;
 
@@ -29,15 +29,23 @@ public class App
 
         ChromosomeManager chromosomeManager= new ChromosomeManager(dogs,gensPerDog);
         List<List<Chromosome>> chromosomes = chromosomeManager.evolution(maxSteps,world);
-        int index[] = {
-                0
-               ,Chromosome.random.nextInt(chromosomes.size()-2)+1
-               ,Chromosome.random.nextInt(chromosomes.size()-2)+1
+        int i1 = Chromosome.random.nextInt(chromosomes.size()-2)+1;
+        int i2;
+        do{
+            i2 = Chromosome.random.nextInt(chromosomes.size()-2)+1;
+        }while (i1 == i2);
+        if(i1>i2){
+            int tmp = i1;
+            i1 = i2;
+            i2 = tmp;
+        }
+        int index[] = {0
+               ,i1
+               ,i2
                ,chromosomes.size()-1
         };
         for(int i = 0; i<index.length;i++) {
-            Plotter plotter = new Plotter(chromosomes.get(index[i]), world, "generation"+String.valueOf(i));
-            plotter.setTitle("Some dogs");
+            Plotter plotter = new Plotter(chromosomes.get(index[i]), world, "generation"+String.valueOf(index[i]));
             //plotter.setVisible(true);
         }
     }

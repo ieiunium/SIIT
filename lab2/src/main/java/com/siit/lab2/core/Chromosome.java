@@ -9,9 +9,11 @@ import java.util.Random;
 public class Chromosome implements Comparable{
     protected int gens[];
     private int numberOfGens;
-    private int fitness;
+    private double fitness;
+    private double sharingFitness;
     public static final Random random = new Random();
-
+    private int x,y;
+    public int id;
     public Chromosome(final int numberOfGens){
         if(numberOfGens < 1){
             this.numberOfGens = 1000;
@@ -23,19 +25,18 @@ public class Chromosome implements Comparable{
             gens[i] = random.nextInt(4);
         }
     }
+    private Chromosome(){
+    }
     public void reset(Chromosome chromosome){
         for(int i=0;i<gens.length;i++){
             gens[i] = chromosome.gens[i];
         }
     }
-    private Chromosome(){
-
-    }
-    public int calcFitness(World world){
+    public double calcFitness(World world){
         fitness = world.simulate(this,world);
         return fitness;
     }
-    public int getFitness(){
+    public double getFitness(){
         return fitness;
     }
     @Override
@@ -63,7 +64,7 @@ public class Chromosome implements Comparable{
             }else {
                 chromosome.gens[i] = father.gens[i];
             }
-            if(random.nextInt(1000)<10){
+            if(random.nextInt(1000)<1){
                 chromosome.gens[i] = random.nextInt(4);
             }
         }
@@ -73,7 +74,7 @@ public class Chromosome implements Comparable{
     @Override
     public int compareTo(Object o) {
         if(o instanceof Chromosome){
-            return -((Chromosome)o).getFitness() + this.getFitness();
+            return (int) ((-((Chromosome)o).getFitness() + this.getFitness()) );
         }else {
             return 0;
         }
@@ -91,8 +92,31 @@ public class Chromosome implements Comparable{
         }
     }
 
-    public static int dist(Chromosome c1, Chromosome c2){
-        //TODO
-        return 0;
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setFitness(double fitness) {
+        this.fitness = fitness;
+    }
+
+    public double getSharingFitness() {
+        return sharingFitness;
+    }
+
+    public void setSharingFitness(double sharingFitness) {
+        this.sharingFitness = sharingFitness;
     }
 }

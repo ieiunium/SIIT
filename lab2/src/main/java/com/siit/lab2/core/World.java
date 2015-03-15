@@ -72,13 +72,21 @@ public class World {
                 y-=heigth;
             }
             if(found(x,y)){
+                chromosome.setX(x);
+                chromosome.setY(y);
                 return 0;
             }
             if(drown(x, y)){
+                chromosome.setX(x);
+                chromosome.setY(y);
                 return -1;
             }
         }
-        return dist(x,y);
+        chromosome.setX(x);
+        chromosome.setY(y);
+        HotDog hd = hotDogs.get(chromosome.id);
+        //return dist(x,y);//
+        return Math.abs(x - hd.x)+Math.abs(y - hd.y);
     }
     public boolean found(int x,int y){
         for(HotDog i:hotDogs){
@@ -96,6 +104,7 @@ public class World {
         }
         return false;
     }
+    static int cur = 0;
     public int dist(int x,int y){
         int res = Integer.MAX_VALUE;
         HotDog hd = null;
@@ -107,6 +116,7 @@ public class World {
             }
         }
         return res;
+
     }
 
     public void paint(Graphics g,int DX,int DY){
