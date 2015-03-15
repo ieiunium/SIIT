@@ -78,6 +78,7 @@ public class ChromosomeManager {
 
             double bF = 0;
             double bFit = 0;
+            double avgF = 0;
             for(int i = 0;i<all.length;i++ ){
                 double S = 0;
                 for(int j = 0;j<all.length;j++ ){
@@ -91,7 +92,9 @@ public class ChromosomeManager {
                     bFit = fit;
                     bF = f;
                 }
+                avgF += all[i].getSharingFitness();
             }
+            avgF /=40;
 
             try {
                 File f= new File("target/steps/"+String.valueOf(step));
@@ -137,6 +140,7 @@ public class ChromosomeManager {
             pwStep.println(step);
             pwFit.println(bF);
             pwShFit.println(bFit);
+
 
             Chromosome tmp[][] = chromosomes;
             chromosomes = children;
