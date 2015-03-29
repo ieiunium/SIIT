@@ -1,0 +1,460 @@
+package com.company.mlp;
+
+import com.company.mlp.math.genetics.ChromosomeManager;
+import com.company.mlp.math.genetics.FitnessFunction;
+import com.company.mlp.math.neural.NeuralNetwork;
+import com.company.mlp.math.neural.functions.ActivationFunction;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Random;
+
+public class Main {
+    public static double ins[][] = new double[32][5];
+    public static double outs[] = new double[32];
+    static {
+        for (int i = 0; i < 32; i++) {
+            int k=i;
+            int s = 0;
+            for (int j = 0; j < 5; j++) {
+                ins[i][j] = k%2;
+                s += k%2;
+                k /= 2;
+            }
+            if(s%2==0){
+                outs[i] = +1;
+            }else{
+                outs[i] = -1;
+            }
+        }
+    };
+
+    public static void main(String[] args) {
+        try {
+            Runtime.getRuntime().exec("mkdir ./target");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        int config[] = {5,5,1};
+        NeuralNetwork nn = new NeuralNetwork(config, new ActivationFunction());
+        System.out.println(nn.numOfGens());
+        ChromosomeManager chromosomeManager = new ChromosomeManager(20,nn.numOfGens(),new FitnessFunction());
+        chromosomeManager.evolution(100000);
+    }
+}
+package com.company.mlp.math.genetics;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.*;
+
+/**
+ * Created by kirill-good on 11.2.15.
+ */
+public class ChromosomeManager {
+    protected Chromosome chromosomes[] = null;
+    protected FitnessFunction fitnessFunction;
+    public ChromosomeManager(final int numberOfChromosome,int gensPerChromosome,FitnessFunction fitnessFunction){
+        this.fitnessFunction = fitnessFunction;
+        chromosomes = new Chromosome[numberOfChromosome];
+        for(int i = 0;i< numberOfChromosome;i++){
+            chromosomes[i]= new Chromosome(gensPerChromosome);
+            chromosomes[i].setFitnessFunction(fitnessFunction);
+        }
+    }
+    public void evolution(int steps){
+        double fit = 0;
+        Chromosome children[] = chromosomes.clone();
+        PrintWriter pwFitness = null;
+        PrintWriter pwGeneration = null;
+        try {
+
+            pwFitness = new PrintWriter(new File("./target/fitness.txt"));
+            pwGeneration = new PrintWriter(new File("./target/step.txt"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        for(int step = 0; step < steps; step++) {// || fit < 31.9
+
+            for(Chromosome i: chromosomes){
+                i.calcFitness();
+            }
+
+            Arrays.sort(chromosomes);
+            System.out.println(step + " " + chromosomes[0].fitness()+" "+ chromosomes[chromosomes.length-1].fitness());
+            if(step%1000==0){
+                fitnessFunction.printTable(chromosomes[0],step);
+            }
+            pwFitness.println(chromosomes[0].fitness());
+            pwGeneration.println(step);
+
+            fit = chromosomes[0].fitness();
+            if(fit > 31.9){
+                pwFitness.flush();
+                pwFitness.close();
+                pwGeneration.flush();
+                pwGeneration.close();
+                return;
+            }
+            int half = chromosomes.length / 2;
+
+            for (int i = 0; i < chromosomes.length; i++) {
+
+                int i1 = Chromosome.random.nextInt(half);
+                int i2;
+                double s;
+                do{
+                    i2 = Chromosome.random.nextInt(half);
+                }while (i1==i2);
+                Chromosome d1 = chromosomes[i1];
+                Chromosome d2 = chromosomes[i2];
+                children[i] = Chromosome.crossOver(d1, d2);
+            }
+            Chromosome tmp[] = children;
+            children = chromosomes;
+            chromosomes = tmp;
+        }
+    }
+    public Chromosome[] getChromosomes() {
+        return chromosomes;
+    }
+
+    public void setChromosomes(Chromosome[] chromosomes) {
+        this.chromosomes = chromosomes;
+    }
+
+    public FitnessFunction getFitnessFunction() {
+        return fitnessFunction;
+    }
+
+    public void setFitnessFunction(FitnessFunction fitnessFunction) {
+        this.fitnessFunction = fitnessFunction;
+    }
+}
+package com.company.mlp.math.genetics;
+
+import com.company.mlp.Main;
+import com.company.mlp.math.neural.NeuralNetwork;
+import com.company.mlp.math.neural.functions.ActivationFunction;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+
+/**
+ * Created by kirill-good on 11.2.15.
+ */
+public class FitnessFunction {
+    int config[] = {5,5,1};
+    NeuralNetwork nn = new NeuralNetwork(config, new ActivationFunction());
+    public void printTable(Chromosome chromosome,int id){
+        File f = new File("./target/"+id);
+        f.mkdir();
+        PrintWriter pwIn = null;
+        PrintWriter pwOut = null;
+        PrintWriter pwMustBeOut = null;
+        PrintWriter pwOk = null;
+        try {
+            pwIn = new PrintWriter(new File(f,"in.txt"));
+            pwOut = new PrintWriter(new File(f,"out.txt"));
+            pwMustBeOut = new PrintWriter(new File(f,"mustbeout.txt"));
+            pwOk = new PrintWriter(new File(f,"ok.txt"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        nn.setGens(chromosome.getGens());
+        for (int i = 0; i < 32; i++) {
+            double out1 = nn.getOut(Main.ins[i])[0];
+            double out2 = Main.outs[i];
+            for (int j = 0; j < Main.ins[i].length; j++) {
+                pwIn.print((int)Main.ins[i][j]+" ");
+            }
+            pwIn.println();
+            pwOut.println((int)out1);
+            pwMustBeOut.println((int)out2);
+            double d = Math.abs(out1 - out2);
+            if (d < 0.1) {
+                pwOk.println("+");
+            } else {
+                pwOk.println("-");
+            }
+        }
+        pwIn.flush();
+        pwIn.close();
+        pwOut.flush();
+        pwOut.close();
+        pwMustBeOut.flush();
+        pwMustBeOut.close();
+        pwOk.flush();
+        pwOk.close();
+    }
+    public double fitness(Chromosome chromosome) {
+        double res = 0;
+        nn.setGens(chromosome.getGens());
+        for (int i = 0; i < 32; i++) {
+            double out1 = nn.getOut(Main.ins[i])[0];
+            double out2 = Main.outs[i];
+            double d = Math.abs(out1 - out2);
+            if (d < 0.1) {
+                res += 1;
+            } else {
+            }
+        }
+        return res;
+    }
+}
+package com.company.mlp.math.genetics;
+
+import java.util.Random;
+
+/**
+ * Created by kirill-good on 11.2.15.
+ */
+public class Chromosome implements Comparable {
+    protected double gens[];
+    private FitnessFunction fitnessFunction = new FitnessFunction();
+    private double fitnessValue;
+    public static final Random random = new Random();
+    public Chromosome(final int numberOfGens){
+        gens = new double[numberOfGens];
+        for(int i=0;i<gens.length;i++){
+            gens[i] = random.nextBoolean()?-1:1 * random.nextDouble();
+        }
+    }
+    public Chromosome(double[] gens) {
+        this.gens = gens;
+    }
+
+    public static Chromosome crossOver(Chromosome mother,Chromosome father){
+
+        double gens[] = new double[father.gens.length];
+        int b = random.nextInt(gens.length);
+        for(int i = 0; i < father.gens.length; i++){
+            if(random.nextBoolean()){
+                gens[i] = father.gens[i];
+            }else{
+                gens[i] = mother.gens[i];
+            }
+            if(random.nextDouble()<0.0075){
+                gens[i] = random.nextDouble()*2 - 1;
+            }
+        }
+        Chromosome res = new Chromosome(gens);
+        res.setFitnessFunction(mother.fitnessFunction);
+        return res;
+    }
+    @Override
+    public int compareTo(Object o) {
+        if(o instanceof Chromosome){
+            if(((Chromosome)o).fitness() == this.fitness()){
+                return 0;
+            }else {
+                return (((Chromosome) o).fitness() - this.fitness()) > 0 ? +1 : -1;
+            }
+        }else {
+            return 0;
+        }
+    }
+    public FitnessFunction getFitnessFunction() {
+        return fitnessFunction;
+    }
+    public void setFitnessFunction(FitnessFunction fitnessFunction) {
+        this.fitnessFunction = fitnessFunction;
+    }
+    public void calcFitness(){
+        fitnessValue = fitnessFunction.fitness(this);
+    }
+    public double fitness(){
+        return fitnessValue;
+    }
+    public double[] getGens() {
+        return gens;
+    }
+    public void setGens(double[] gens) {
+        this.gens = gens;
+    }
+    public void mutation(double p){
+        for(int i = 0 ; i< gens.length;i++){
+            if(random.nextDouble()<p){
+                gens[i] = ( random.nextDouble()*2 - 1 );
+            }
+        }
+    }
+    public double getFitnessValue() {
+        return fitnessValue;
+    }
+    public void setFitnessValue(double fitnessValue) {
+        this.fitnessValue = fitnessValue;
+    }
+    public void setGens(Chromosome chromosome) {
+        for (int i = 0; i < gens.length; i++) {
+            this.gens[i] = chromosome.gens[i];
+        }
+    }
+}package com.company.mlp.math.neural;
+
+
+
+import com.company.mlp.math.neural.functions.ActivationFunction;
+
+import java.util.Random;
+
+/**
+ * Created by kirill-good on 10.2.15.
+ */
+public class Neuron{
+    protected double T;
+    protected double w[];
+    protected ActivationFunction activationFunction;
+
+    public Neuron(int n,ActivationFunction activationFunction){
+        this.activationFunction = activationFunction;
+        Random random = new Random();
+        w = new double[n];
+        T = (random.nextBoolean()?1:-1) * random.nextDouble();
+        for(int i = 0;i<w.length;i++){
+            w[i] = (random.nextBoolean()?1:-1) * random.nextDouble();
+        }
+    }
+    double getOut(double x[]){
+        double res = -T;
+        for(int i = 0;i<w.length;i++){
+            res += w[i]*x[i];
+        }
+        return activationFunction.F(res);
+    }
+}
+package com.company.mlp.math.neural.functions;
+
+/**
+ * Created by kirill-good on 10.2.15.
+ */
+public class ActivationFunction{
+    public double F(double x){
+        if(x>0){
+            return +1;
+        }else{
+            return -1;
+        }
+    }
+}
+package com.company.mlp.math.neural;
+
+import com.company.mlp.math.neural.functions.ActivationFunction;
+
+/**
+ * Created by kirill-good on 10.2.15.
+ */
+public class NeuralNetwork {
+    private NeuralLayer layer[];
+    private double []gens;
+    protected NeuralNetwork(){}
+    public NeuralNetwork(int config[],ActivationFunction activationFunction){
+        layer = new NeuralLayer[config.length-1];
+        for(int i=0;i<config.length-1;i++){
+            layer[i] = new NeuralLayer(config[i],config[i+1],activationFunction);
+        }
+        gens = new double[numOfGens()];
+    }
+
+    public int numOfGens(){
+        int res = 0;
+        for(NeuralLayer i: layer){
+            for(Neuron j: i.neuron){
+                res += j.w.length + 1;
+            }
+        }
+        return res;
+    }
+    public double[] getOut(double x[]){
+        double res[] = x;
+        for(int i = 0;i<layer.length;i++){
+            res = layer[i].getOut( res );
+        }
+        return res;
+    }
+    public double[] getGens(){
+        int c = 0;
+        for(NeuralLayer i: layer){
+            for(Neuron j: i.neuron){
+                gens[c++] = j.T;
+                for(double k: j.w){
+                    gens[c++] = k;
+                }
+            }
+        }
+        return gens;
+    }
+    public void setGens(double[] gens){
+        if(gens.length==this.gens.length){
+            int c = 0;
+            for(NeuralLayer i: layer){
+                for(Neuron j: i.neuron){
+                    j.T = gens[c++];
+                    for(int k=0;k<j.w.length;k++){
+                        j.w[k] = gens[c++];
+                    }
+                }
+            }
+        }else{
+            throw new RuntimeException("bad gen's length");
+        }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("NN{");
+        for(NeuralLayer i: layer){
+            sb.append("L{");
+            for(Neuron j: i.neuron){
+                sb.append("N{");
+                sb.append("T=");
+                sb.append(j.T*10000);
+                sb.append(" ");
+                sb.append("w[]={");
+                for(int k=0;k<j.w.length;k++){
+                    sb.append((int)(j.w[k]*10000));
+                    sb.append(" ");
+                }
+                sb.append("}} ");
+            }
+            sb.append("} ");
+        }
+        sb.append("}+{ ");
+        double g[] = getGens();
+        for(int i=0;i<g.length;i++){
+            sb.append(g[i]);
+            sb.append(", ");
+        }
+        sb.append("}");
+        return sb.toString();
+    }
+}
+
+package com.company.mlp.math.neural;
+
+import com.company.mlp.math.neural.functions.ActivationFunction;
+
+/**
+ * Created by kirill-good on 10.2.15.
+ */
+public class NeuralLayer {
+    protected Neuron neuron[];
+    protected double outs[];
+
+    public NeuralLayer(int in,int out,ActivationFunction activationFunction){
+        neuron = new Neuron[out];
+        outs = new double[out];
+        for(int i = 0;i<neuron.length;i++){
+            neuron[i] = new Neuron(in,activationFunction);
+            outs[i] = 0;
+        }
+    }
+    double[] getOut(double x[]){
+        for(int i = 0;i<neuron.length;i++){
+            outs[i] = neuron[i].getOut(x);
+        }
+        return outs;
+    }
+}

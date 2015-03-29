@@ -25,7 +25,7 @@ public class Plotter extends JFrame{
         this.chromosomes = chromosomes;
         this.world = world;
         this.setSize(2*DX+world.width,2*DY+world.heigth);
-        this.saveToPNG(filename);
+        //this.saveToPNG(filename);
         this.saveToFiles(filename);
     }
     public void saveToFiles(String fileName){
