@@ -1,5 +1,8 @@
 package com.siit.lab2.core;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.*;
 
 /**
@@ -20,7 +23,14 @@ public class ChromosomeManager {
     }
 
     public void evolution(int steps){
-
+        PrintWriter pw = null;
+        PrintWriter pw2 = null;
+        try {
+            pw = new PrintWriter(new File("target/table.txt"));
+            pw2 = new PrintWriter(new File("target/step-fitness.txt"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         Chromosome children[] = chromosomes.clone();
         for(int step = 0; step < steps; step++) {
 
@@ -29,13 +39,19 @@ public class ChromosomeManager {
             }
 
             Arrays.sort(chromosomes);
-            System.out.println(step + " " + chromosomes[0].fitness());
+            System.out.println(step + " " + chromosomes[0].fitness()+" "+ chromosomes[chromosomes.length-1].fitness());
+            pw2.println(step + " " + chromosomes[0].fitness()+" "+ chromosomes[chromosomes.length-1].fitness());
+
+            pw.println("step " + step+"\t"+ chromosomes[0].fitness());
+            fitnessFunction.printDistTable(chromosomes[0],pw);
+            pw.println(fitnessFunction.getPointsTable(chromosomes[0]));
+            pw.println("==================");
+
             int half = chromosomes.length / 2;
             for (int i = 0; i < chromosomes.length; i++) {
 
                 int i1 = Chromosome.random.nextInt(half);
                 int i2;
-                double s;
                 do{
                     i2 = Chromosome.random.nextInt(half);
                 }while (i1==i2);
@@ -48,6 +64,10 @@ public class ChromosomeManager {
             children = chromosomes;
             chromosomes = tmp;
         }
+        pw.flush();
+        pw.close();
+        pw2.flush();
+        pw2.close();
     }
 
     public Chromosome[] getChromosomes() {

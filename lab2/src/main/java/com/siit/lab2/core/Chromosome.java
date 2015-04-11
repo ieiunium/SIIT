@@ -7,7 +7,7 @@ import java.util.Random;
  */
 public class Chromosome implements Comparable {
     protected double gens[];
-    private FitnessFunction fitnessFunction = new FitnessFunction();
+    private FitnessFunction fitnessFunction = null;
     private double fitnessValue;
     public static final Random random = new Random();
     public Chromosome(final int numberOfGens){
@@ -48,9 +48,15 @@ public class Chromosome implements Comparable {
         for(int i = 0; i < father.gens.length; i++){
             if(random.nextBoolean()){
                 gens[i] = father.gens[i];
+
+            }else{
                 gens[i] = mother.gens[i];
             }
+            if(random.nextDouble()<(1.5/22.0)){
+                gens[i] = random.nextDouble()*2-1;
+            }
         }
+
         Chromosome res = new Chromosome(gens);
         res.setFitnessFunction(mother.fitnessFunction);
         return res;
@@ -62,7 +68,7 @@ public class Chromosome implements Comparable {
             if(((Chromosome)o).fitness() == this.fitness()){
                 return 0;
             }else {
-                return (((Chromosome) o).fitness() - this.fitness()) > 0 ? 1 : -1;
+                return (((Chromosome) o).fitness() < this.fitness())? +1 : -1;
             }
         }else {
             return 0;

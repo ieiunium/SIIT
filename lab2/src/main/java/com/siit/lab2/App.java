@@ -16,14 +16,14 @@ public class App
     public static final String folder = "target/";
     public static void main( String[] args )
     {
-        int maxSteps = 2000;
-        int numOfChromosomes = 40;
-        int numOfGens = 1000;
+        int maxSteps = 10000;
+        int numOfChromosomes = 10;
+        int numOfGens = 22;
 
-
-        ChromosomeManager chromosomeManager= new ChromosomeManager(numOfChromosomes,numOfGens,new FitnessFunction());
+        FitnessFunction fitnessFunction = new FitnessFunction();
+        ChromosomeManager chromosomeManager= new ChromosomeManager(numOfChromosomes,numOfGens,fitnessFunction);
         chromosomeManager.evolution(maxSteps);
-
+        //System.out.println(fitnessFunction.getPointsTable(chromosomeManager.getChromosomes()[0]));
         /*int i1 = Chromosome.random.nextInt(chromosomes.size()-2)+1;
         int i2;
         do{
