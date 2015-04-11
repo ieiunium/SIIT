@@ -1,122 +1,117 @@
 package com.siit.lab2.core;
 
-import java.awt.*;
 import java.util.Random;
 
 /**
- * Created by kirill-good on 9.2.15.
+ * Created by kirill-good on 11.2.15.
  */
-public class Chromosome implements Comparable{
-    protected int gens[];
-    private int numberOfGens;
-    private double fitness;
-    private double sharingFitness;
+public class Chromosome implements Comparable {
+    protected double gens[];
+    private FitnessFunction fitnessFunction = new FitnessFunction();
+    private double fitnessValue;
     public static final Random random = new Random();
-    private int x,y;
-    public int id;
     public Chromosome(final int numberOfGens){
-        if(numberOfGens < 1){
-            this.numberOfGens = 1000;
-        }else {
-            this.numberOfGens = numberOfGens;
-        }
-        gens = new int[numberOfGens];
+        gens = new double[numberOfGens];
         for(int i=0;i<gens.length;i++){
-            gens[i] = random.nextInt(4);
+            gens[i] = random.nextBoolean()?-1:1 * random.nextDouble();
         }
+    }
+
+    public Chromosome(double[] gens) {
+        this.gens = gens;
     }
     private Chromosome(){
-    }
-    public void reset(Chromosome chromosome){
-        for(int i=0;i<gens.length;i++){
-            gens[i] = chromosome.gens[i];
-        }
-    }
-    public double calcFitness(World world){
-        fitness = world.simulate(this,world);
-        return fitness;
-    }
-    public double getFitness(){
-        return fitness;
+
     }
     @Override
     public String toString(){
-        StringBuilder stringBuilder = new StringBuilder();
-        for(int i:gens){
-            stringBuilder.append(i);
+        StringBuilder stringBuilder = new StringBuilder("[");
+        for(double i:gens){
+            stringBuilder.append(i+", ");
         }
+        stringBuilder.append("]");
         return stringBuilder.toString();
     }
+
     public Chromosome getCopy(){
         Chromosome chromosome = new Chromosome();
-        chromosome.gens = this.gens.clone();
-        chromosome.numberOfGens = this.numberOfGens;
+        chromosome.gens = new double[this.gens.length];
+        for (int i = 0;i<gens.length;i++){
+            chromosome.gens[i] = this.gens[i];
+        }
+        chromosome.setFitnessFunction(this.fitnessFunction);
         return chromosome;
     }
     public static Chromosome crossOver(Chromosome mother,Chromosome father){
-        if(mother.numberOfGens!=father.numberOfGens){
-            throw new RuntimeException("mother.lenth!=father.length");
-        }
-        Chromosome chromosome = mother.getCopy();
-        for(int i = 0; i < mother.gens.length; i++){
+
+        double gens[] = new double[father.gens.length];
+        for(int i = 0; i < father.gens.length; i++){
             if(random.nextBoolean()){
-                chromosome.gens[i] = mother.gens[i];
-            }else {
-                chromosome.gens[i] = father.gens[i];
-            }
-            if(random.nextInt(1000)<1){
-                chromosome.gens[i] = random.nextInt(4);
+                gens[i] = father.gens[i];
+                gens[i] = mother.gens[i];
             }
         }
-        return chromosome;
+        Chromosome res = new Chromosome(gens);
+        res.setFitnessFunction(mother.fitnessFunction);
+        return res;
     }
 
     @Override
     public int compareTo(Object o) {
         if(o instanceof Chromosome){
-            return (int) ((-((Chromosome)o).getFitness() + this.getFitness()) );
+            if(((Chromosome)o).fitness() == this.fitness()){
+                return 0;
+            }else {
+                return (((Chromosome) o).fitness() - this.fitness()) > 0 ? 1 : -1;
+            }
         }else {
             return 0;
         }
     }
-    public void paint(Graphics g,int DX,int DY){
 
+    public FitnessFunction getFitnessFunction() {
+        return fitnessFunction;
     }
 
-    public static double s(double d){
-        double sigma = 10;
-        if(d<sigma){
-            return 1-(d/sigma);
-        }else{
-            return 0;
+    public void setFitnessFunction(FitnessFunction fitnessFunction) {
+        this.fitnessFunction = fitnessFunction;
+    }
+    public void calcFitness(){
+        fitnessValue = fitnessFunction.fitness(this);
+    }
+    public double fitness(){
+        return fitnessValue;
+    }
+
+    public double[] getGens() {
+        return gens;
+    }
+
+    public void setGens(double[] gens) {
+        this.gens = gens;
+    }
+
+    public static double dist(Chromosome mother,Chromosome father){
+        double s = 0;
+        for(int i = 0 ; i< mother.gens.length;i++){
+            s += Math.pow(mother.gens[i] - father.gens[i],2);
+        }
+        return Math.sqrt(s);
+    }
+    public void mutation(double p){
+        for(int i = 0 ; i< gens.length;i++){
+            if(random.nextDouble()<p){
+                //gens[i] += random.nextDouble()*0.2 - 0.1;
+                gens[i] = random.nextDouble()*2 - 1;
+            }
         }
     }
 
-    public int getY() {
-        return y;
+    public double getFitnessValue() {
+        return fitnessValue;
     }
 
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public void setFitness(double fitness) {
-        this.fitness = fitness;
-    }
-
-    public double getSharingFitness() {
-        return sharingFitness;
-    }
-
-    public void setSharingFitness(double sharingFitness) {
-        this.sharingFitness = sharingFitness;
+    public void setFitnessValue(double fitnessValue) {
+        this.fitnessValue = fitnessValue;
     }
 }
