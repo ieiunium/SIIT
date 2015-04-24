@@ -19,7 +19,7 @@ public class App
         int maxSteps = 10000;
         int numOfChromosomes = 10;
         int numOfGens = 22;
-
+        
         FitnessFunction fitnessFunction = new FitnessFunction();
         ChromosomeManager chromosomeManager= new ChromosomeManager(numOfChromosomes,numOfGens,fitnessFunction);
         chromosomeManager.evolution(maxSteps);

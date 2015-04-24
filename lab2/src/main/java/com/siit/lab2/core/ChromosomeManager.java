@@ -23,29 +23,22 @@ public class ChromosomeManager {
     }
 
     public void evolution(int steps){
-        PrintWriter pw = null;
+        /*PrintWriter pw = null;
         PrintWriter pw2 = null;
         try {
             pw = new PrintWriter(new File("target/table.txt"));
             pw2 = new PrintWriter(new File("target/step-fitness.txt"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }
+        }*/
         Chromosome children[] = chromosomes.clone();
         for(int step = 0; step < steps; step++) {
 
             for(Chromosome i: chromosomes){
                 i.calcFitness();
             }
-
             Arrays.sort(chromosomes);
             System.out.println(step + " " + chromosomes[0].fitness()+" "+ chromosomes[chromosomes.length-1].fitness());
-            pw2.println(step + " " + chromosomes[0].fitness()+" "+ chromosomes[chromosomes.length-1].fitness());
-
-            pw.println("step " + step+"\t"+ chromosomes[0].fitness());
-            fitnessFunction.printDistTable(chromosomes[0],pw);
-            pw.println(fitnessFunction.getPointsTable(chromosomes[0]));
-            pw.println("==================");
 
             int half = chromosomes.length / 2;
             for (int i = 0; i < chromosomes.length; i++) {
@@ -58,16 +51,15 @@ public class ChromosomeManager {
                 Chromosome d1 = chromosomes[i1].getCopy();
                 Chromosome d2 = chromosomes[i2].getCopy();
                 children[i] = Chromosome.crossOver(d1, d2);
-                //System.out.println("\t"+ Chromosome.dist(d1,d2));
             }
             Chromosome tmp[] = children;
             children = chromosomes;
             chromosomes = tmp;
         }
-        pw.flush();
+        /*pw.flush();
         pw.close();
         pw2.flush();
-        pw2.close();
+        pw2.close();*/
     }
 
     public Chromosome[] getChromosomes() {
