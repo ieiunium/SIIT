@@ -2,8 +2,16 @@ package com.siit.lab2;
 
 import com.siit.lab2.core.*;
 
+import javax.imageio.ImageIO;
 import javax.management.openmbean.SimpleType;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.*;
+import java.util.List;
 
 /**
  * Hello world!
@@ -14,11 +22,14 @@ public class App
     public static final String FOLDER = "target/";
     static Random random = new Random();
     static int chromosome[] = new int[150];
+    static PrintStream out = System.out;
     public static void main( String[] args )
     {
         for (int i = 0; i < chromosome.length; i++) {
             chromosome[i] = random.nextInt(16);
         }
+
+        plot(chromosome);
 
         List<Integer> sets[] = new ArrayList[5];
 
@@ -28,11 +39,11 @@ public class App
                 sets[i].add(j);
             }
             Collections.shuffle(sets[i]);
-            System.out.println("set#" + i + arrayToString(sets[i]));
+            out.println("set#" + i + arrayToString(sets[i]));
 
         }
 
-        System.out.println("chromosome: "+Arrays.toString(chromosome));
+        out.println("chromosome: "+arrayToString(chromosome));
 
         fitness(sets);
     }
@@ -60,13 +71,13 @@ public class App
                 }
             }
             int f = fitness(mas);
-            System.out.println("from "+arrayToString(i));
-            System.out.println("  to "+arrayToString(mas));
-            System.out.println("      fitness = "+f);
-            System.out.println("real compares = "+compares);
-            System.out.println();
-            System.out.println("***********************");
-            System.out.println();
+            out.println("before "+arrayToString(i));
+            out.println(" after "+arrayToString(mas));
+            out.println("      fitness = "+f);
+            out.println("real compares = "+compares);
+            out.println();
+            out.println("***********************");
+            out.println();
         }
 
         return res;
@@ -108,5 +119,50 @@ public class App
         }
         sb.append("]");
         return sb.toString();
+    }
+
+    static void plot(int chromosome[]){
+        BufferedImage image = new BufferedImage(1000,200,BufferedImage.TYPE_INT_ARGB);
+        Graphics g = image.getGraphics();
+        g.setColor(Color.WHITE);
+
+        g.fillRect(0, 0, image.getWidth(), image.getHeight());
+        g.setColor(Color.BLACK);
+        int H = 10;
+        int W = 10;
+        for (int i = 0; i < 16; i++) {
+            int h = H*(i+1);
+            g.drawLine(0,h,image.getWidth(),h);
+        }
+
+        for (int i = 0; i < chromosome.length/2; i+=2) {
+            if(chromosome[i]!=chromosome[i+1]) {
+                int x = (i + 1) * W;
+                int y1 = (chromosome[i] + 1) * H;
+                int y2 = (chromosome[i + 1] + 1) * H;
+                drawArrowDown(g, x, Math.max(y1, y2));
+                drawArrowUp(g, x, Math.min(y1, y2));
+                g.drawLine(x, y1, x, y2);
+            }
+        }
+
+        try {
+            ImageIO.write(image,"png",new File("diagram.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static void drawArrowUp(Graphics g,int x,int y){
+        final int dx = 3;
+        final int dy = 3;
+        g.drawLine(x,y,x+dx,y+dy);
+        g.drawLine(x,y,x-dx,y+dy);
+    }
+    static void drawArrowDown(Graphics g,int x,int y){
+        final int dx = 3;
+        final int dy = 3;
+        g.drawLine(x,y,x+dx,y-dy);
+        g.drawLine(x,y,x-dx,y-dy);
     }
 }
