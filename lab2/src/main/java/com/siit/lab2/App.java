@@ -6,10 +6,7 @@ import javax.imageio.ImageIO;
 import javax.management.openmbean.SimpleType;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.*;
 import java.util.List;
 
@@ -23,6 +20,13 @@ public class App
     static Random random = new Random();
     static int chromosome[] = new int[150];
     static PrintStream out = System.out;
+    static{
+        try {
+            out = new PrintStream(new File("target/out.txt"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
     public static void main( String[] args )
     {
         for (int i = 0; i < chromosome.length; i++) {
@@ -129,13 +133,13 @@ public class App
         g.fillRect(0, 0, image.getWidth(), image.getHeight());
         g.setColor(Color.BLACK);
         int H = 10;
-        int W = 10;
+        int W = 6;
         for (int i = 0; i < 16; i++) {
             int h = H*(i+1);
             g.drawLine(0,h,image.getWidth(),h);
         }
 
-        for (int i = 0; i < chromosome.length/2; i+=2) {
+        for (int i = 0; i < chromosome.length; i+=2) {
             if(chromosome[i]!=chromosome[i+1]) {
                 int x = (i + 1) * W;
                 int y1 = (chromosome[i] + 1) * H;
@@ -147,7 +151,7 @@ public class App
         }
 
         try {
-            ImageIO.write(image,"png",new File("diagram.png"));
+            ImageIO.write(image,"png",new File("target/diagram.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
